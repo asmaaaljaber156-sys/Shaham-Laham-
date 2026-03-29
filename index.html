@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة شحم لحم 🥩</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: 'Arial', sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .game-container { max-width: 600px; margin: auto; background: #2c3e50; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .score-board { font-size: 1.5rem; margin-bottom: 20px; color: #f1c40f; font-weight: bold; }
+        .card-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 120px; background: rgba(0,0,0,0.3); border-radius: 15px; padding: 15px; margin-bottom: 20px; }
+        .card { width: 70px; height: 100px; background: white; color: black; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.4rem; cursor: pointer; border: 3px solid #fff; }
+        .card.fat { border-color: #f1c40f; background: #fffdf0; color: #d35400; }
+        .card.meat { border-color: #ecf0f1; background: #f9f9f9; }
+        .card.joker { background: #9b59b6; color: white; border-color: #8e44ad; }
+        #message { background: #e67e22; padding: 10px; border-radius: 10px; margin: 15px 0; font-weight: bold; }
+        button { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🥩 شحم لحم 🃏</h1>
+    <div class="score-board">شحمك المجموع: <span id="score">0</span></div>
+    <div id="message">اختر ورقة من يدك للمطابقة!</div>
+    <div class="card-area" id="field"></div>
+    <div class="card-area" id="hand"></div>
+    <button onclick="location.reload()">توزيع جديد 🔄</button>
+</div>
+
+<script>
+    const fatCards = ['10', 'J', 'Q', 'K', 'A'];
+    const meatCards = ['2', '3', '4', '5', '6', '7', '8', '9'];
+    const allCards = [...fatCards, ...meatCards];
+    let score = 0;
+
+    function createCardElement(val) {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerText = val;
+        if (fatCards.includes(val)) div.classList.add('fat');
+        else if (val === '🃏') div.classList.add('joker');
+        else div.classList.add('meat');
+        return div;
+    }
+
+    function init() {
+        const field = document.getElementById('field');
+        const hand = document.getElementById('hand');
+        for(let i=0; i<4; i++) field.appendChild(createCardElement(allCards[Math.floor(Math.random() * allCards.length)]));
+        for(let i=0; i<4; i++) {
+            let deckWithJoker = [...allCards, '🃏'];
+            let c = createCardElement(deckWithJoker[Math.floor(Math.random() * deckWithJoker.length)]);
+            c.onclick = () => playCard(c);
+            hand.appendChild(c);
+        }
+    }
+
+    function playCard(card) {
+        const fieldCards = document.querySelectorAll('#field .card');
+        let matched = false;
+        fieldCards.forEach(f => {
+            if (card.innerText === f.innerText || card.innerText === '🃏') {
+                if (fatCards.includes(f.innerText)) { score++; document.getElementById('score').innerText = score; }
+                f.remove(); matched = true;
+            }
+        });
+        if (!matched) document.getElementById('field').appendChild(createCardElement(card.innerText));
+        card.remove();
+    }
+    init();
+</script>
+</body>
+</html>
